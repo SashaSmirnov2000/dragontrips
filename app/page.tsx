@@ -3,13 +3,12 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from './supabase';
 import Link from 'next/link';
 
-// ── Tour Card ─────────────────────────────────────────────────────────────────
+// ── Tour Card (список) ────────────────────────────────────────────────────────
 function TourCard({ tour, lang, t }: { tour: any; lang: 'ru' | 'en'; t: any }) {
   const [imgIndex, setImgIndex] = useState(0);
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
 
-  // Нормализуем gallery — Supabase может вернуть null, строку или массив
   const rawGallery = tour.gallery;
   const galleryArr: string[] = Array.isArray(rawGallery)
     ? rawGallery
@@ -51,120 +50,130 @@ function TourCard({ tour, lang, t }: { tour: any; lang: 'ru' | 'en'; t: any }) {
     touchStartY.current = null;
   };
 
-  // Единственное поле цены
   const priceNum = tour.price ? Number(tour.price) : null;
+  const priceUSD = priceNum ? Math.round(priceNum / 26000) : null;
   const tourName = lang === 'ru' ? tour.name_ru : (tour.name_en || tour.name_ru);
+  const tourDesc = lang === 'ru' ? tour.desc_ru : (tour.desc_en || tour.desc_ru);
 
   return (
     <div
-      className="card-in group flex flex-col rounded-2xl overflow-hidden active:scale-[0.98] transition-all duration-300"
+      className="card-in overflow-hidden active:scale-[0.985] transition-all duration-200"
       style={{
         background: 'rgba(255,255,255,0.03)',
-        border: '1px solid rgba(255,255,255,0.08)',
-        boxShadow: '0 10px 30px -15px rgba(0,0,0,0.5)',
+        border: '1px solid rgba(255,255,255,0.07)',
+        borderRadius: 24,
+        boxShadow: '0 8px 32px -12px rgba(0,0,0,0.6)',
       }}
     >
-      {/* ── IMAGE / GALLERY ── */}
-      <div
-        className="relative w-full overflow-hidden bg-[#0c0f1c]"
-        style={{ aspectRatio: '1/1' }}
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
-      >
-        {total > 0 ? (
-          <>
-            {/* Слайдер: каждый слайд абсолютно позиционирован, переключаем opacity */}
-            <div className="relative w-full h-full">
-              {images.map((url, idx) => (
-                <img
-                  key={idx}
-                  src={url}
-                  className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
-                  style={{ opacity: idx === imgIndex ? 1 : 0 }}
-                  alt={`${tourName} ${idx + 1}`}
-                  draggable={false}
-                />
-              ))}
+      <Link href={`/tour/${tour.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
+
+        {/* ── ФОТО широкое 16:9 ── */}
+        <div
+          className="relative w-full overflow-hidden bg-[#0c0f1c]"
+          style={{ aspectRatio: '16/9' }}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+        >
+          {total > 0 ? (
+            <>
+              <div className="relative w-full h-full">
+                {images.map((url, idx) => (
+                  <img
+                    key={idx}
+                    src={url}
+                    className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
+                    style={{ opacity: idx === imgIndex ? 1 : 0 }}
+                    alt={`${tourName} ${idx + 1}`}
+                    draggable={false}
+                  />
+                ))}
+              </div>
+
+              {total > 1 && (
+                <>
+                  <button onClick={prev}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center z-10"
+                    style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.12)', color: '#fff', opacity: imgIndex === 0 ? 0 : 1, transition: 'opacity .2s', fontSize: 20 }}>
+                    ‹
+                  </button>
+                  <button onClick={next}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center z-10"
+                    style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.12)', color: '#fff', opacity: imgIndex === total - 1 ? 0 : 1, transition: 'opacity .2s', fontSize: 20 }}>
+                    ›
+                  </button>
+                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+                    {images.map((_, idx) => (
+                      <div key={idx} className="rounded-full transition-all duration-300"
+                        style={{ width: idx === imgIndex ? 14 : 4, height: 4, background: idx === imgIndex ? '#f59e0b' : 'rgba(255,255,255,0.35)' }} />
+                    ))}
+                  </div>
+                </>
+              )}
+            </>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-4xl" style={{ opacity: 0.1 }}>🗺️</div>
+          )}
+
+          {tour.hot && (
+            <div className="absolute top-3 left-3 z-20">
+              <span className="px-2.5 py-1 rounded-full text-[8px] font-black uppercase tracking-tight"
+                style={{ background: 'linear-gradient(135deg,#92400e,#b91c1c)', color: '#fff', boxShadow: '0 0 14px rgba(185,28,28,0.5)', border: '1px solid rgba(255,255,255,0.15)' }}>
+                🔥 {t.hot}
+              </span>
             </div>
+          )}
 
-            {total > 1 && (
-              <>
-                <button
-                  onClick={prev}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full flex items-center justify-center z-10"
-                  style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', opacity: imgIndex === 0 ? 0 : 1, transition: 'opacity .2s', fontSize: 18, lineHeight: 1 }}
-                >‹</button>
-                <button
-                  onClick={next}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full flex items-center justify-center z-10"
-                  style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', opacity: imgIndex === total - 1 ? 0 : 1, transition: 'opacity .2s', fontSize: 18, lineHeight: 1 }}
-                >›</button>
-
-                {/* Dot indicators */}
-                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1 z-10">
-                  {images.map((_, idx) => (
-                    <div key={idx} className="rounded-full transition-all duration-300"
-                      style={{ width: idx === imgIndex ? 12 : 4, height: 4, background: idx === imgIndex ? '#fff' : 'rgba(255,255,255,0.3)' }} />
-                  ))}
-                </div>
-              </>
-            )}
-          </>
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-3xl" style={{ opacity: 0.12 }}>🗺️</div>
-        )}
-
-        {/* HOT badge */}
-        {tour.hot && (
-          <div className="absolute top-3 left-3 z-20">
-            <span className="px-2.5 py-1 rounded-full text-[8px] font-black uppercase tracking-tight"
-              style={{ background: 'linear-gradient(135deg,#92400e,#b91c1c)', color: '#fff', boxShadow: '0 0 14px rgba(185,28,28,0.5)', border: '1px solid rgba(255,255,255,0.15)' }}>
-              🔥 {t.hot}
+          {tour.duration_h && (
+            <span className="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg text-[9px] font-bold z-10"
+              style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.75)' }}>
+              ⏱ {tour.duration_h}ч
             </span>
-          </div>
-        )}
+          )}
 
-        {/* Bottom gradient */}
-        <div className="absolute bottom-0 inset-x-0 h-1/3 pointer-events-none"
-          style={{ background: 'linear-gradient(to top,rgba(6,8,16,0.85),transparent)' }} />
+          <div className="absolute bottom-0 inset-x-0 h-1/3 pointer-events-none"
+            style={{ background: 'linear-gradient(to top,rgba(6,8,16,0.7),transparent)' }} />
+        </div>
 
-        {/* Duration chip */}
-        {tour.duration_h && (
-          <span className="absolute bottom-3 right-3 px-2 py-0.5 rounded-lg text-[8px] font-bold z-10"
-            style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)' }}>
-            ⏱ {tour.duration_h}ч
-          </span>
-        )}
-      </div>
+        {/* ── ТЕКСТ ── */}
+        <div style={{ padding: '16px 18px 18px' }}>
+          {tour.category && (
+            <p className="text-[8px] font-black uppercase tracking-[0.2em] mb-1.5" style={{ color: 'rgba(245,158,11,0.7)' }}>
+              {tour.category}
+            </p>
+          )}
 
-      {/* ── BODY ── */}
-      <Link href={`/tour/${tour.id}`} className="p-4 flex flex-col flex-1">
-        {/* Category */}
-        {tour.category && (
-          <p className="text-[8px] font-black uppercase tracking-[0.15em] mb-1.5" style={{ color: 'rgba(245,158,11,0.75)' }}>
-            {tour.category}
-          </p>
-        )}
+          <h3 style={{ fontSize: 16, fontWeight: 800, lineHeight: 1.25, color: 'rgba(255,255,255,0.92)', marginBottom: 6 }}>
+            {tourName}
+          </h3>
 
-        {/* Name */}
-        <h3 className="text-[14px] font-bold leading-[1.25] mb-3 line-clamp-2" style={{ color: 'rgba(255,255,255,0.9)' }}>
-          {tourName}
-        </h3>
+          {tourDesc && (
+            <p className="line-clamp-2" style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', lineHeight: 1.6, marginBottom: 14 }}>
+              {tourDesc}
+            </p>
+          )}
 
-        {/* Price + arrow */}
-        <div className="mt-auto pt-3 flex items-center justify-between"
-          style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-          <div className="flex flex-col gap-0.5">
-            <span className="text-[7px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.28)' }}>
-              {t.totalPrice}
-            </span>
-            <span className="text-[15px] font-black tracking-tight" style={{ color: '#f59e0b' }}>
-              {priceNum ? `${priceNum.toLocaleString()} ₫` : '—'}
-            </span>
-          </div>
-          <div className="w-8 h-8 rounded-full flex items-center justify-center"
-            style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.2)' }}>
-            <span style={{ color: '#f59e0b', fontSize: 14 }}>→</span>
+          <div className="flex items-center justify-between pt-3"
+            style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+            <div>
+              <p style={{ fontSize: 7, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(255,255,255,0.28)', marginBottom: 3 }}>
+                {t.totalPrice}
+              </p>
+              <div className="flex items-baseline gap-1.5">
+                <span style={{ fontSize: 18, fontWeight: 900, color: '#f59e0b', letterSpacing: '-0.5px' }}>
+                  {priceNum ? `${priceNum.toLocaleString()} ₫` : '—'}
+                </span>
+                {priceUSD && (
+                  <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.28)', fontWeight: 600 }}>≈ {priceUSD} $</span>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl"
+              style={{ background: 'linear-gradient(135deg,#92400e,#b91c1c)', boxShadow: '0 4px 16px rgba(185,28,28,0.3)' }}>
+              <span style={{ color: '#fff', fontSize: 11, fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                {t.book}
+              </span>
+              <span style={{ color: '#fff', fontSize: 14 }}>→</span>
+            </div>
           </div>
         </div>
       </Link>
@@ -174,13 +183,13 @@ function TourCard({ tour, lang, t }: { tour: any; lang: 'ru' | 'en'; t: any }) {
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function Home() {
-  const [lang, setLang]                   = useState<'ru' | 'en'>('ru');
-  const [tours, setTours]                 = useState<any[]>([]);
-  const [filteredTours, setFilteredTours] = useState<any[]>([]);
-  const [loading, setLoading]             = useState(true);
-  const [ref, setRef]                     = useState<string>('');
+  const [lang, setLang]                     = useState<'ru' | 'en'>('ru');
+  const [tours, setTours]                   = useState<any[]>([]);
+  const [filteredTours, setFilteredTours]   = useState<any[]>([]);
+  const [loading, setLoading]               = useState(true);
+  const [ref, setRef]                       = useState<string>('');
   const [activeCategory, setActiveCategory] = useState<string>('All');
-  const [heroLoaded, setHeroLoaded]       = useState(false);
+  const [heroLoaded, setHeroLoaded]         = useState(false);
 
   useEffect(() => {
     const savedLang = localStorage.getItem('userLang') as 'ru' | 'en';
@@ -189,7 +198,6 @@ export default function Home() {
     const savedCategory = sessionStorage.getItem('activeCategory');
     if (savedCategory) setActiveCategory(savedCategory);
 
-    // ── Telegram ref / referral (оригинальный) ────────────────────────────
     const initRefLogic = () => {
       const tg = (window as any).Telegram?.WebApp;
       const urlParams = new URLSearchParams(window.location.search);
@@ -213,7 +221,6 @@ export default function Home() {
     const interval = setInterval(() => { if (initRefLogic()) clearInterval(interval); }, 500);
     setTimeout(() => clearInterval(interval), 3000);
 
-    // ── Telegram WebApp init ──────────────────────────────────────────────
     const tg = (window as any).Telegram?.WebApp;
     if (tg) {
       tg.ready();
@@ -222,7 +229,6 @@ export default function Home() {
       if (tg.setBackgroundColor) tg.setBackgroundColor('#060810');
     }
 
-    // ── Load tours (только активные, поле is_active = true) ───────────────
     async function loadTours() {
       const { data, error } = await supabase
         .from('tours')
@@ -238,7 +244,6 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  // ── Filter by category ────────────────────────────────────────────────────
   useEffect(() => {
     sessionStorage.setItem('activeCategory', activeCategory);
     if (activeCategory === 'All') setFilteredTours(tours);
@@ -251,14 +256,11 @@ export default function Home() {
     localStorage.setItem('userLang', newLang);
   };
 
-  // ── Категории — добавляй по мере надобности ───────────────────────────────
   const categories = [
     { id: 'All',   icon: '✦',  ru: 'Все туры',  en: 'All'       },
     { id: 'Море',  icon: '🌊', ru: 'Море',       en: 'Sea'       },
     { id: 'Горы',  icon: '⛰️', ru: 'Горы',       en: 'Mountains' },
     { id: 'Город', icon: '🏯', ru: 'Город',      en: 'City'      },
-    // { id: 'Природа', icon: '🌿', ru: 'Природа', en: 'Nature' },
-    // { id: 'Дайвинг', icon: '🤿', ru: 'Дайвинг', en: 'Diving' },
   ];
 
   const t = {
@@ -269,6 +271,7 @@ export default function Home() {
       noTours:    'В этой категории пока нет туров',
       hot:        'ХИТ',
       rate:       '1$ ≈ 26k ₫',
+      book:       'Подробнее',
     },
     en: {
       subtitle:   'Da Nang, Vietnam',
@@ -277,6 +280,7 @@ export default function Home() {
       noTours:    'No tours in this category yet',
       hot:        'TOP',
       rate:       '1$ ≈ 26k ₫',
+      book:       'Details',
     },
   };
 
@@ -291,7 +295,7 @@ export default function Home() {
 
         .hero-photo{
           position:absolute; inset:0; width:100%; height:100%;
-          object-fit:cover; object-position:center 85%;
+          object-fit:cover; object-position:70% 85%;
           opacity:0; transform:scale(1.07);
           transition:opacity 1.5s ease, transform 2s ease;
         }
@@ -423,8 +427,8 @@ export default function Home() {
         <div className="w-full h-px" style={{ background:'linear-gradient(to right,transparent,rgba(245,158,11,0.15),transparent)' }} />
       </section>
 
-      {/* ── TOURS GRID ── */}
-      <section className="px-3 pt-6 pb-24 w-full max-w-4xl mx-auto">
+      {/* ── TOURS LIST ── */}
+      <section className="px-3 pt-5 pb-24 w-full max-w-lg mx-auto">
         {loading ? (
           <div className="flex justify-center py-20">
             <div className="w-8 h-8 rounded-full border-2 animate-spin"
@@ -438,9 +442,9 @@ export default function Home() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="flex flex-col gap-4">
             {filteredTours.map((tour, i) => (
-              <div key={tour.id} style={{ animationDelay:`${i * 50}ms` }}>
+              <div key={tour.id} style={{ animationDelay:`${i * 60}ms` }}>
                 <TourCard tour={tour} lang={lang} t={t[lang]} />
               </div>
             ))}
