@@ -326,11 +326,46 @@ export default function TourPage() {
           )}
 
           {gallery.length>1&&(
-            <div style={{position:'absolute',bottom:12,right:16,display:'flex',gap:4}}>
-              {gallery.map((_,i)=>(
-                <div key={i} style={{height:2,transition:'all .3s',width:i===activePhoto?16:5,background:i===activePhoto?'#f59e0b':'rgba(255,255,255,0.3)'}}/>
-              ))}
-            </div>
+            <>
+              {/* Тап-зона ВЛЕВО */}
+              <button
+                onClick={()=>setActivePhoto(p=>Math.max(0,p-1))}
+                style={{position:'absolute',left:0,top:0,width:'42%',height:'100%',background:'transparent',border:'none',cursor:'pointer',zIndex:10,WebkitTapHighlightColor:'transparent'}}
+                aria-label="prev"
+              >
+                <div style={{
+                  position:'absolute',left:0,top:0,width:'100%',height:'100%',
+                  opacity: activePhoto===0 ? 0 : 1,
+                  transition:'opacity .2s',
+                  background:'linear-gradient(to right,rgba(0,0,0,0.18) 0%,transparent 100%)',
+                  display:'flex',alignItems:'center',justifyContent:'flex-start',paddingLeft:10,
+                }}>
+                  <span style={{fontSize:28,color:'rgba(255,255,255,0.7)',fontWeight:200,lineHeight:1,textShadow:'0 1px 8px rgba(0,0,0,0.6)'}}>‹</span>
+                </div>
+              </button>
+              {/* Тап-зона ВПРАВО */}
+              <button
+                onClick={()=>setActivePhoto(p=>Math.min(gallery.length-1,p+1))}
+                style={{position:'absolute',right:0,top:0,width:'42%',height:'100%',background:'transparent',border:'none',cursor:'pointer',zIndex:10,WebkitTapHighlightColor:'transparent'}}
+                aria-label="next"
+              >
+                <div style={{
+                  position:'absolute',left:0,top:0,width:'100%',height:'100%',
+                  opacity: activePhoto===gallery.length-1 ? 0 : 1,
+                  transition:'opacity .2s',
+                  background:'linear-gradient(to left,rgba(0,0,0,0.18) 0%,transparent 100%)',
+                  display:'flex',alignItems:'center',justifyContent:'flex-end',paddingRight:10,
+                }}>
+                  <span style={{fontSize:28,color:'rgba(255,255,255,0.7)',fontWeight:200,lineHeight:1,textShadow:'0 1px 8px rgba(0,0,0,0.6)'}}>›</span>
+                </div>
+              </button>
+              {/* Индикаторы */}
+              <div style={{position:'absolute',bottom:12,left:'50%',transform:'translateX(-50%)',display:'flex',gap:4,zIndex:11,pointerEvents:'none'}}>
+                {gallery.map((_,i)=>(
+                  <div key={i} style={{height:2,transition:'all .3s',width:i===activePhoto?16:5,background:i===activePhoto?'#f59e0b':'rgba(255,255,255,0.4)'}}/>
+                ))}
+              </div>
+            </>
           )}
         </div>
 
