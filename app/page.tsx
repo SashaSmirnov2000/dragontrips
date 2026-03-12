@@ -59,8 +59,8 @@ function TourCard({ tour, lang, t }: { tour: any; lang: 'ru' | 'en'; t: any }) {
     <div
       className="card-in overflow-hidden active:scale-[0.985] transition-all duration-200"
       style={{
-        background: 'rgba(255,255,255,0.055)',
-        border: '1px solid rgba(255,255,255,0.11)',
+        background: 'rgba(255,255,255,0.08)',
+        border: '1px solid rgba(255,255,255,0.14)',
         borderRadius: 24,
         boxShadow: '0 8px 32px -12px rgba(0,0,0,0.6)',
       }}
@@ -225,8 +225,8 @@ export default function Home() {
     if (tg) {
       tg.ready();
       tg.expand();
-      if (tg.setHeaderColor)     tg.setHeaderColor('#060810');
-      if (tg.setBackgroundColor) tg.setBackgroundColor('#060810');
+      if (tg.setHeaderColor)     tg.setHeaderColor('#161c27');
+      if (tg.setBackgroundColor) tg.setBackgroundColor('#161c27');
     }
 
     async function loadTours() {
@@ -246,8 +246,7 @@ export default function Home() {
 
   useEffect(() => {
     sessionStorage.setItem('activeCategory', activeCategory);
-    if (activeCategory === 'All') setFilteredTours(tours);
-    else setFilteredTours(tours.filter(t => t.category === activeCategory));
+    setFilteredTours(tours);
   }, [activeCategory, tours]);
 
   const toggleLang = () => {
@@ -288,14 +287,14 @@ export default function Home() {
 
   return (
     <main style={{ fontFamily: "'DM Sans',sans-serif" }}
-      className="bg-[#0d1117] min-h-screen text-white flex flex-col overflow-x-hidden selection:bg-amber-500/30">
+      className="bg-[#161c27] min-h-screen text-white flex flex-col overflow-x-hidden selection:bg-amber-500/30">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&display=swap');
         .bebas{ font-family:'Bebas Neue',sans-serif; }
 
         .hero-photo{
           position:absolute; inset:0; width:100%; height:100%;
-          object-fit:cover; object-position:85% 85%;
+          object-fit:cover; object-position:20% 60%;
           opacity:0; transform:scale(1.07);
           transition:opacity 1.5s ease, transform 2s ease;
         }
@@ -307,12 +306,12 @@ export default function Home() {
         }
         .hero-fade{
           position:absolute; inset:0;
-          background:linear-gradient(to bottom,rgba(6,8,16,0.2) 0%,rgba(6,8,16,0) 25%,rgba(13,17,23,0.6) 70%,rgba(13,17,23,1) 100%);
+          background:linear-gradient(to bottom,rgba(22,28,39,0.1) 0%,rgba(22,28,39,0) 20%,rgba(22,28,39,0.55) 68%,rgba(22,28,39,1) 100%);
           pointer-events:none;
         }
         .hero-sides{
           position:absolute; inset:0;
-          background:linear-gradient(to right,rgba(13,17,23,0.3) 0%,transparent 25%,transparent 75%,rgba(13,17,23,0.3) 100%);
+          background:transparent;
           pointer-events:none;
         }
 
@@ -354,7 +353,7 @@ export default function Home() {
 
       {/* ── NAV ── */}
       <nav className="fixed top-0 w-full z-[100] flex items-center justify-between px-4 h-14"
-        style={{ background:'linear-gradient(to bottom,rgba(13,17,23,0.97) 0%,rgba(13,17,23,0) 100%)', backdropFilter:'blur(10px)' }}>
+        style={{ background:'linear-gradient(to bottom,rgba(22,28,39,0.97) 0%,rgba(22,28,39,0) 100%)', backdropFilter:'blur(10px)' }}>
         <button onClick={() => setActiveCategory('All')} className="flex items-center gap-2 active:opacity-70 transition-opacity">
           <div className="relative w-8 h-8 rounded-xl flex items-center justify-center text-base overflow-hidden"
             style={{ background:'linear-gradient(135deg,#92400e,#b91c1c)', boxShadow:'0 0 14px rgba(220,38,38,0.4)' }}>
@@ -408,20 +407,6 @@ export default function Home() {
             style={{ color:'rgba(255,255,255,0.45)', textShadow:'0 1px 8px rgba(0,0,0,0.9)' }}>
             {t[lang].tagline}
           </p>
-        </div>
-
-        {/* ── CATEGORIES ── */}
-        <div className="relative z-10 w-full px-3 pb-3">
-          <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-            {categories.map(cat => (
-              <button key={cat.id} onClick={() => setActiveCategory(cat.id)}
-                className={`flex-shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[10px] font-black uppercase tracking-tight transition-all active:scale-95 border ${activeCategory === cat.id ? 'pill-on' : ''}`}
-                style={activeCategory !== cat.id ? { background:'rgba(255,255,255,0.04)', borderColor:'rgba(255,255,255,0.07)', color:'rgba(255,255,255,0.45)' } : {}}>
-                <span className="text-[13px] leading-none">{cat.icon}</span>
-                {lang === 'ru' ? cat.ru : cat.en}
-              </button>
-            ))}
-          </div>
         </div>
 
         <div className="w-full h-px" style={{ background:'linear-gradient(to right,transparent,rgba(245,158,11,0.15),transparent)' }} />
