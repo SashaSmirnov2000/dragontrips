@@ -312,7 +312,7 @@ export default function TourPage() {
               <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:64,opacity:0.06}}>🗺️</div>
             )}
           </div>
-          <div style={{position:'absolute',inset:0,pointerEvents:'none',background:'linear-gradient(to top,rgba(13,17,23,1) 0%,rgba(13,17,23,0.05) 55%,transparent 100%)'}}/>
+          <div style={{position:'absolute',inset:0,pointerEvents:'none',background:'linear-gradient(to top,rgba(13,17,23,0.25) 0%,transparent 50%)'}}/>
           {tour.hot&&(
             <div style={{position:'absolute',top:0,left:0,background:'#b91c1c',padding:'5px 12px'}}>
               <span style={{fontSize:8,fontWeight:900,letterSpacing:'0.3em',textTransform:'uppercase',color:'#fff'}}>ХИТ СЕЗОНА</span>
@@ -324,22 +324,7 @@ export default function TourPage() {
               <span style={{fontSize:9,color:'rgba(255,255,255,0.5)',marginLeft:3,letterSpacing:'0.1em'}}>ЧАС</span>
             </div>
           )}
-          {/* Title + price */}
-          <div style={{position:'absolute',bottom:0,left:0,right:0,padding:'0 18px 20px'}}>
-            <div className="fsw" style={{height:2,width:28,marginBottom:8}}/>
-            <h1 className="bebas" style={{fontSize:36,lineHeight:1.05,letterSpacing:2,textShadow:'0 2px 24px rgba(0,0,0,0.9)',marginBottom:displayBase?8:0}}>
-              {tourName}
-            </h1>
-            {displayBase&&(
-              <div style={{display:'flex',alignItems:'baseline',gap:8}}>
-                <span style={{fontSize:22,fontWeight:900,color:'#f59e0b',letterSpacing:-0.5,textShadow:'0 2px 16px rgba(0,0,0,0.8)'}}>
-                  {fmt$(displayBase)}
-                </span>
-                <span style={{fontSize:11,color:'rgba(255,255,255,0.35)',fontWeight:600}}>{fmtVnd(displayBase)}</span>
-                <span style={{fontSize:10,color:'rgba(255,255,255,0.3)'}}>{t.perPerson}</span>
-              </div>
-            )}
-          </div>
+
           {gallery.length>1&&(
             <div style={{position:'absolute',bottom:12,right:16,display:'flex',gap:4}}>
               {gallery.map((_,i)=>(
@@ -360,6 +345,23 @@ export default function TourPage() {
             ))}
           </div>
         )}
+
+        {/* TITLE BLOCK — под фото */}
+        <div style={{padding:'18px 16px 0',borderBottom:'1px solid rgba(255,255,255,0.07)'}}>
+          <div className="fsw" style={{height:2,width:24,marginBottom:10}}/>
+          <h1 className="bebas" style={{fontSize:34,lineHeight:1.05,letterSpacing:2,color:'#fff',marginBottom:displayBase?10:0}}>
+            {tourName}
+          </h1>
+          {displayBase&&(
+            <div style={{display:'flex',alignItems:'baseline',gap:8,paddingBottom:16}}>
+              <span style={{fontSize:26,fontWeight:900,color:'#f59e0b',letterSpacing:-0.5,lineHeight:1}}>
+                {fmt$(displayBase)}
+              </span>
+              <span style={{fontSize:12,color:'rgba(255,255,255,0.3)',fontWeight:500}}>{fmtVnd(displayBase)}</span>
+              <span style={{fontSize:10,color:'rgba(255,255,255,0.25)'}}>{t.perPerson}</span>
+            </div>
+          )}
+        </div>
 
         <div className="fu2" style={{padding:'0 16px'}}>
 
