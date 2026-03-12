@@ -59,8 +59,8 @@ function TourCard({ tour, lang, t }: { tour: any; lang: 'ru' | 'en'; t: any }) {
     <div
       className="card-in overflow-hidden active:scale-[0.985] transition-all duration-200"
       style={{
-        background: 'rgba(255,255,255,0.03)',
-        border: '1px solid rgba(255,255,255,0.07)',
+        background: 'rgba(255,255,255,0.055)',
+        border: '1px solid rgba(255,255,255,0.11)',
         borderRadius: 24,
         boxShadow: '0 8px 32px -12px rgba(0,0,0,0.6)',
       }}
@@ -147,7 +147,7 @@ function TourCard({ tour, lang, t }: { tour: any; lang: 'ru' | 'en'; t: any }) {
           </h3>
 
           {tourDesc && (
-            <p className="line-clamp-2" style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', lineHeight: 1.6, marginBottom: 14 }}>
+            <p className="line-clamp-2" style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6, marginBottom: 14 }}>
               {tourDesc}
             </p>
           )}
@@ -288,31 +288,31 @@ export default function Home() {
 
   return (
     <main style={{ fontFamily: "'DM Sans',sans-serif" }}
-      className="bg-[#060810] min-h-screen text-white flex flex-col overflow-x-hidden selection:bg-amber-500/30">
+      className="bg-[#0d1117] min-h-screen text-white flex flex-col overflow-x-hidden selection:bg-amber-500/30">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&display=swap');
         .bebas{ font-family:'Bebas Neue',sans-serif; }
 
         .hero-photo{
           position:absolute; inset:0; width:100%; height:100%;
-          object-fit:cover; object-position:70% 85%;
+          object-fit:cover; object-position:85% 85%;
           opacity:0; transform:scale(1.07);
           transition:opacity 1.5s ease, transform 2s ease;
         }
         .hero-photo.loaded{ opacity:1; transform:scale(1); }
         .hero-tone{
           position:absolute; inset:0;
-          background:linear-gradient(160deg,rgba(160,40,0,0.45) 0%,rgba(220,120,0,0.18) 40%,rgba(6,8,16,0) 65%);
+          background:linear-gradient(160deg,rgba(160,40,0,0.2) 0%,rgba(220,120,0,0.08) 40%,rgba(13,17,23,0) 65%);
           mix-blend-mode:multiply; pointer-events:none;
         }
         .hero-fade{
           position:absolute; inset:0;
-          background:linear-gradient(to bottom,rgba(6,8,16,0.45) 0%,rgba(6,8,16,0) 30%,rgba(6,8,16,0.75) 72%,rgba(6,8,16,1) 100%);
+          background:linear-gradient(to bottom,rgba(6,8,16,0.2) 0%,rgba(6,8,16,0) 25%,rgba(13,17,23,0.6) 70%,rgba(13,17,23,1) 100%);
           pointer-events:none;
         }
         .hero-sides{
           position:absolute; inset:0;
-          background:linear-gradient(to right,rgba(6,8,16,0.55) 0%,transparent 30%,transparent 70%,rgba(6,8,16,0.55) 100%);
+          background:linear-gradient(to right,rgba(13,17,23,0.3) 0%,transparent 25%,transparent 75%,rgba(13,17,23,0.3) 100%);
           pointer-events:none;
         }
 
@@ -354,7 +354,7 @@ export default function Home() {
 
       {/* ── NAV ── */}
       <nav className="fixed top-0 w-full z-[100] flex items-center justify-between px-4 h-14"
-        style={{ background:'linear-gradient(to bottom,rgba(6,8,16,0.97) 0%,rgba(6,8,16,0) 100%)', backdropFilter:'blur(10px)' }}>
+        style={{ background:'linear-gradient(to bottom,rgba(13,17,23,0.97) 0%,rgba(13,17,23,0) 100%)', backdropFilter:'blur(10px)' }}>
         <button onClick={() => setActiveCategory('All')} className="flex items-center gap-2 active:opacity-70 transition-opacity">
           <div className="relative w-8 h-8 rounded-xl flex items-center justify-center text-base overflow-hidden"
             style={{ background:'linear-gradient(135deg,#92400e,#b91c1c)', boxShadow:'0 0 14px rgba(220,38,38,0.4)' }}>
