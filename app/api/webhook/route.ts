@@ -392,11 +392,13 @@ export async function POST(req: Request) {
         const parts      = text.split(' ');
         const startParam = parts.length > 1 ? parts[1] : 'direct';
 
-        // Сохраняем пользователя + реферала
-        await supabaseAdmin.from('users').upsert(
-          { telegram_id: chatId, referrer: startParam, username },
-          { onConflict: 'telegram_id' }
-        );
+        // Сохраняем пользователя + реферала (тихо игнорируем ошибку если таблица не готова)
+        try {
+          await supabaseAdmin.from('users').upsert(
+            { telegram_id: chatId, referrer: startParam, username },
+            { onConflict: 'telegram_id' }
+          );
+        } catch { /* таблица users может отсутствовать */ }
 
         const isSubscribed = await checkSubscription(token, userId);
 

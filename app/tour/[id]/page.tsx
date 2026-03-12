@@ -86,13 +86,18 @@ export default function TourPage() {
     };
 
     try {
-      const { error: dbError } = await supabase.from('bookings').insert([bookingData]);
+      // Сохраняем в БД и получаем id записи
+      const { data: newBooking, error: dbError } = await supabase
+        .from('bookings').insert([bookingData]).select().single();
       if (dbError) throw dbError;
+
+      // Отправляем уведомление боту с booking_id
       await fetch('/api/send-telegram', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(bookingData),
+        body: JSON.stringify({ ...bookingData, booking_id: newBooking?.id }),
       });
+
       setIsSubmitted(true);
     } catch (err: any) {
       alert('Error: ' + err.message);
@@ -158,7 +163,6 @@ export default function TourPage() {
   const priceNum = tour.price ? Number(tour.price) : null;
   const priceUSD = priceNum ? Math.round(priceNum / 26000) : null;
 
-  // ──────────────────────────────────────────────────────────────────────────
   return (
     <main style={{ minHeight:'100vh', background:'#060810', color:'#fff', fontFamily:"'DM Sans',sans-serif", display:'flex', flexDirection:'column', alignItems:'center', overflowX:'hidden' }}>
       <style>{`
@@ -213,10 +217,8 @@ export default function TourPage() {
             )}
           </div>
 
-          {/* Overlay */}
           <div style={{ position:'absolute', inset:0, pointerEvents:'none', background:'linear-gradient(to top,rgba(6,8,16,0.95) 0%,rgba(6,8,16,0.15) 55%)' }} />
 
-          {/* Bottom title + price */}
           <div style={{ position:'absolute', bottom:28, left:24, right:24, pointerEvents:'none' }}>
             <div className="fire-sweep" style={{ height:2, width:36, borderRadius:2, marginBottom:10 }} />
             <h1 className="bebas" style={{ fontSize:36, lineHeight:1.05, letterSpacing:2, textShadow:'0 2px 24px rgba(0,0,0,0.9)', marginBottom: priceNum ? 8 : 0 }}>
@@ -234,14 +236,12 @@ export default function TourPage() {
             )}
           </div>
 
-          {/* HOT badge */}
           {tour.hot && (
             <div style={{ position:'absolute', top:16, left:16, padding:'4px 12px', borderRadius:8, background:'linear-gradient(135deg,#92400e,#b91c1c)', fontSize:8, fontWeight:900, letterSpacing:2, textTransform:'uppercase' }}>
               🔥 ХИТ
             </div>
           )}
 
-          {/* Dot indicators */}
           {gallery.length > 1 && (
             <div style={{ position:'absolute', bottom:14, right:20, display:'flex', gap:5 }}>
               {gallery.map((_, i) => (
@@ -265,7 +265,6 @@ export default function TourPage() {
         {/* ── DETAILS CARD ── */}
         <div className="fade-up-2" style={{ background:'rgba(255,255,255,0.025)', border:'1px solid rgba(255,255,255,0.07)', borderRadius:28, padding:24, marginBottom:14 }}>
 
-          {/* Meta chips */}
           <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginBottom:22 }}>
             {tour.category && (
               <div style={{ padding:'9px 14px', borderRadius:12, background:'rgba(245,158,11,0.08)', border:'1px solid rgba(245,158,11,0.15)', display:'flex', flexDirection:'column', gap:3 }}>
@@ -287,7 +286,6 @@ export default function TourPage() {
             )}
           </div>
 
-          {/* Description */}
           <div style={{ marginBottom:24 }}>
             <p style={{ fontSize:9, color:'rgba(255,255,255,0.25)', fontWeight:900, textTransform:'uppercase', letterSpacing:2.5, marginBottom:10 }}>
               {t[lang].description}
@@ -297,7 +295,6 @@ export default function TourPage() {
             </p>
           </div>
 
-          {/* Book button */}
           <button
             className="book-btn"
             onClick={() => { setShowModal(true); setIsSubmitted(false); setSelectedDate(''); }}
@@ -316,14 +313,12 @@ export default function TourPage() {
           <div className="modal-anim" style={{ position:'relative', width:'100%', maxWidth:380, background:'#0f1320', border:'1px solid rgba(255,255,255,0.08)', borderRadius:32, padding:28, boxShadow:'0 32px 80px rgba(0,0,0,0.7)' }}>
             {!isSubmitted ? (
               <form onSubmit={handleBooking}>
-                {/* Header */}
                 <div style={{ textAlign:'center', marginBottom:22 }}>
                   <div className="fire-sweep" style={{ height:2, width:32, borderRadius:2, margin:'0 auto 14px' }} />
                   <h2 className="bebas" style={{ fontSize:24, letterSpacing:2, lineHeight:1.1, marginBottom:4 }}>{tourName}</h2>
                   <p style={{ fontSize:9, color:'rgba(255,255,255,0.28)', fontWeight:900, letterSpacing:2.5, textTransform:'uppercase' }}>{t[lang].modalSub}</p>
                 </div>
 
-                {/* Price reminder */}
                 {priceNum && (
                   <div style={{ background:'rgba(245,158,11,0.07)', border:'1px solid rgba(245,158,11,0.18)', borderRadius:14, padding:'12px 18px', marginBottom:16, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
                     <span style={{ fontSize:10, color:'rgba(245,158,11,0.65)', fontWeight:900, textTransform:'uppercase', letterSpacing:1 }}>{t[lang].price}</span>
@@ -334,7 +329,6 @@ export default function TourPage() {
                   </div>
                 )}
 
-                {/* Date picker */}
                 <div style={{ background:'rgba(0,0,0,0.3)', padding:'14px 16px', borderRadius:16, border:'1px solid rgba(255,255,255,0.07)', marginBottom:24 }}>
                   <label style={{ display:'block', fontSize:9, color:'rgba(255,255,255,0.32)', fontWeight:900, textTransform:'uppercase', letterSpacing:1.5, marginBottom:8 }}>
                     📅 {t[lang].labelDate}
@@ -346,7 +340,6 @@ export default function TourPage() {
                   />
                 </div>
 
-                {/* Buttons */}
                 <div style={{ display:'flex', gap:10 }}>
                   <button type="button" onClick={() => setShowModal(false)} style={{ flex:1, padding:'14px 0', borderRadius:14, cursor:'pointer', background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.08)', color:'rgba(255,255,255,0.45)', fontSize:10, fontWeight:900, letterSpacing:1.5, textTransform:'uppercase' }}>
                     {t[lang].close}

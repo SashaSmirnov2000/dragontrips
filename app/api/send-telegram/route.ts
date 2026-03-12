@@ -203,19 +203,11 @@ export async function POST(req: Request) {
         .from('users').select('referrer').eq('telegram_id', telegram_id).single();
       if (userData?.referrer) finalReferrer = userData.referrer;
 
-      // Сохраняем заказ
-      const { data: newOrder } = await supabase
-        .from('bookings')
-        .insert([{
-          bike_id, bike_model,
-          start_date, end_date: end_date || start_date,  // тур — одна дата
-          client_username, telegram_id,
-          status: 'pending', total_price,
-          referrer: finalReferrer,
-        }])
-        .select().single();
+      // Заказ уже сохранён в БД со стороны веб-приложения (tour/[id]/page.tsx)
+      // Здесь только отправляем уведомления
 
       // Уведомление админу
+      const newOrder = { id: body.booking_id || '—' };
       await tgPost(botToken, 'sendMessage', {
         chat_id: MY_ADMIN_ID,
         text:
