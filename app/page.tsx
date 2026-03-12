@@ -3,7 +3,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from './supabase';
 import Link from 'next/link';
 
-// ── Tour Card (список) ────────────────────────────────────────────────────────
+// ── Tour Card — premium editorial style ──────────────────────────────────────
 function TourCard({ tour, lang, t }: { tour: any; lang: 'ru' | 'en'; t: any }) {
   const [imgIndex, setImgIndex] = useState(0);
   const touchStartX = useRef<number | null>(null);
@@ -56,19 +56,10 @@ function TourCard({ tour, lang, t }: { tour: any; lang: 'ru' | 'en'; t: any }) {
   const tourDesc = lang === 'ru' ? tour.desc_ru : (tour.desc_en || tour.desc_ru);
 
   return (
-    <div
-      className="card-in overflow-hidden active:scale-[0.985] transition-all duration-200"
-      style={{
-        background: 'rgba(255,255,255,0.08)',
-        border: '1px solid rgba(255,255,255,0.14)',
-        borderRadius: 12,
-        boxShadow: '0 4px 24px rgba(0,0,0,0.35)',
-        borderLeft: '3px solid rgba(245,158,11,0.5)',
-      }}
-    >
+    <div className="card-in" style={{ borderTop: '1px solid rgba(255,255,255,0.1)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
       <Link href={`/tour/${tour.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
 
-        {/* ── ФОТО широкое 16:9 ── */}
+        {/* ── ФОТО 16:9 без скруглений ── */}
         <div
           className="relative w-full overflow-hidden bg-[#0c0f1c]"
           style={{ aspectRatio: '16/9' }}
@@ -76,105 +67,116 @@ function TourCard({ tour, lang, t }: { tour: any; lang: 'ru' | 'en'; t: any }) {
           onTouchEnd={onTouchEnd}
         >
           {total > 0 ? (
-            <>
-              <div className="relative w-full h-full">
-                {images.map((url, idx) => (
-                  <img
-                    key={idx}
-                    src={url}
-                    className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
-                    style={{ opacity: idx === imgIndex ? 1 : 0 }}
-                    alt={`${tourName} ${idx + 1}`}
-                    draggable={false}
-                  />
-                ))}
-              </div>
-
-              {total > 1 && (
-                <>
-                  <button onClick={prev}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center z-10"
-                    style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.12)', color: '#fff', opacity: imgIndex === 0 ? 0 : 1, transition: 'opacity .2s', fontSize: 20 }}>
-                    ‹
-                  </button>
-                  <button onClick={next}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center z-10"
-                    style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.12)', color: '#fff', opacity: imgIndex === total - 1 ? 0 : 1, transition: 'opacity .2s', fontSize: 20 }}>
-                    ›
-                  </button>
-                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1 z-10">
-                    {images.map((_, idx) => (
-                      <div key={idx} className="rounded-full transition-all duration-300"
-                        style={{ width: idx === imgIndex ? 14 : 4, height: 4, background: idx === imgIndex ? '#f59e0b' : 'rgba(255,255,255,0.35)' }} />
-                    ))}
-                  </div>
-                </>
-              )}
-            </>
+            <div className="relative w-full h-full">
+              {images.map((url, idx) => (
+                <img
+                  key={idx}
+                  src={url}
+                  className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
+                  style={{ opacity: idx === imgIndex ? 1 : 0 }}
+                  alt={`${tourName} ${idx + 1}`}
+                  draggable={false}
+                />
+              ))}
+            </div>
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-4xl" style={{ opacity: 0.1 }}>🗺️</div>
+            <div className="w-full h-full flex items-center justify-center" style={{ opacity: 0.08, fontSize: 48 }}>🗺️</div>
           )}
 
+          {/* Нижний градиент */}
+          <div className="absolute bottom-0 inset-x-0 pointer-events-none" style={{ height: '45%', background: 'linear-gradient(to top, rgba(22,28,39,0.92) 0%, transparent 100%)' }} />
+
+          {/* HOT — тонкая строчная плашка */}
           {tour.hot && (
-            <div className="absolute top-0 left-0 z-20">
-              <span style={{ display:'block', padding:'5px 12px', background:'linear-gradient(90deg,#b91c1c,#92400e)', color:'#fff', fontSize:8, fontWeight:900, letterSpacing:'0.25em', textTransform:'uppercase', borderBottomRightRadius:10 }}>
+            <div className="absolute top-0 left-0 z-20" style={{ background: '#b91c1c', padding: '4px 10px' }}>
+              <span style={{ fontSize: 7, fontWeight: 900, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#fff' }}>
                 ХИТ СЕЗОНА
               </span>
             </div>
           )}
 
+          {/* Длительность — нижний левый угол поверх фото */}
           {tour.duration_h && (
-            <div className="absolute top-3 right-3 z-20 flex items-center gap-1 px-3 py-1.5 rounded-lg"
-              style={{ background:'rgba(0,0,0,0.72)', backdropFilter:'blur(12px)', border:'1px solid rgba(255,255,255,0.18)' }}>
-              <span style={{ fontSize:11, color:'#f59e0b', fontWeight:900 }}>{tour.duration_h}</span>
-              <span style={{ fontSize:9, color:'rgba(255,255,255,0.6)', fontWeight:700 }}>ч</span>
+            <div className="absolute bottom-3 left-4 z-10 flex items-baseline gap-1">
+              <span style={{ fontSize: 22, fontWeight: 900, color: '#fff', lineHeight: 1, textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>{tour.duration_h}</span>
+              <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.6)', letterSpacing: '0.1em', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>ЧАС</span>
             </div>
           )}
 
-          <div className="absolute bottom-0 inset-x-0 h-1/3 pointer-events-none"
-            style={{ background: 'linear-gradient(to top,rgba(6,8,16,0.7),transparent)' }} />
+          {/* Стрелки слайдера */}
+          {total > 1 && (
+            <>
+              <button onClick={prev} className="absolute left-0 top-0 h-full w-12 z-10 flex items-center justify-start pl-2"
+                style={{ opacity: imgIndex === 0 ? 0 : 1, transition: 'opacity .2s', background: 'linear-gradient(to right, rgba(0,0,0,0.3), transparent)' }}>
+                <span style={{ color: '#fff', fontSize: 22, fontWeight: 300 }}>‹</span>
+              </button>
+              <button onClick={next} className="absolute right-0 top-0 h-full w-12 z-10 flex items-center justify-end pr-2"
+                style={{ opacity: imgIndex === total - 1 ? 0 : 1, transition: 'opacity .2s', background: 'linear-gradient(to left, rgba(0,0,0,0.3), transparent)' }}>
+                <span style={{ color: '#fff', fontSize: 22, fontWeight: 300 }}>›</span>
+              </button>
+              {/* Dot indicators — тонкие линии */}
+              <div className="absolute bottom-3 right-4 flex gap-1 z-10">
+                {images.map((_, idx) => (
+                  <div key={idx} style={{ width: idx === imgIndex ? 16 : 6, height: 2, background: idx === imgIndex ? '#f59e0b' : 'rgba(255,255,255,0.4)', transition: 'all .3s' }} />
+                ))}
+              </div>
+            </>
+          )}
         </div>
 
-        {/* ── ТЕКСТ ── */}
-        <div style={{ padding: '16px 18px 18px' }}>
-          {tour.category && (
-            <p className="text-[8px] font-black uppercase tracking-[0.2em] mb-1.5" style={{ color: 'rgba(245,158,11,0.7)' }}>
-              {tour.category}
-            </p>
-          )}
+        {/* ── ТЕКСТ — строгий, минималистичный ── */}
+        <div style={{ padding: '14px 16px 16px', background: 'rgba(255,255,255,0.03)' }}>
 
-          <h3 style={{ fontSize: 16, fontWeight: 800, lineHeight: 1.25, color: 'rgba(255,255,255,0.92)', marginBottom: 6 }}>
+          {/* Верхняя строка: категория + номер */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+            {tour.category ? (
+              <span style={{ fontSize: 8, fontWeight: 900, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(245,158,11,0.65)' }}>
+                {tour.category}
+              </span>
+            ) : <span />}
+            <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.2em', color: 'rgba(255,255,255,0.2)' }}>
+              DA NANG
+            </span>
+          </div>
+
+          {/* Название */}
+          <h3 style={{ fontSize: 17, fontWeight: 800, lineHeight: 1.2, color: '#fff', marginBottom: tourDesc ? 8 : 14, letterSpacing: '-0.2px' }}>
             {tourName}
           </h3>
 
+          {/* Описание */}
           {tourDesc && (
-            <p className="line-clamp-2" style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6, marginBottom: 14 }}>
+            <p className="line-clamp-2" style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', lineHeight: 1.65, marginBottom: 14, fontWeight: 400 }}>
               {tourDesc}
             </p>
           )}
 
-          <div className="flex items-center justify-between pt-3"
-            style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          {/* Нижняя строка — тонкий разделитель */}
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+
+            {/* Цена */}
             <div>
-              <p style={{ fontSize: 7, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(255,255,255,0.28)', marginBottom: 3 }}>
+              <p style={{ fontSize: 7, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.25em', color: 'rgba(255,255,255,0.25)', marginBottom: 4 }}>
                 {t.totalPrice}
               </p>
-              <div className="flex items-baseline gap-1.5">
-                <span style={{ fontSize: 18, fontWeight: 900, color: '#f59e0b', letterSpacing: '-0.5px' }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                <span style={{ fontSize: 20, fontWeight: 900, color: '#f59e0b', letterSpacing: '-0.5px', lineHeight: 1 }}>
                   {priceNum ? `${priceNum.toLocaleString()} ₫` : '—'}
                 </span>
                 {priceUSD && (
-                  <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.28)', fontWeight: 600 }}>≈ {priceUSD} $</span>
+                  <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', fontWeight: 500 }}>/ {priceUSD} $</span>
                 )}
               </div>
             </div>
-            <div className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl"
-              style={{ background: 'linear-gradient(135deg,#92400e,#b91c1c)', boxShadow: '0 4px 16px rgba(185,28,28,0.3)' }}>
-              <span style={{ color: '#fff', fontSize: 11, fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+
+            {/* Кнопка — строгая, без скруглений */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', background: 'transparent', border: '1px solid rgba(255,255,255,0.2)' }}>
+              <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)' }}>
                 {t.book}
               </span>
-              <span style={{ color: '#fff', fontSize: 14 }}>→</span>
+              <span style={{ fontSize: 12, color: '#f59e0b' }}>→</span>
             </div>
+
           </div>
         </div>
       </Link>
@@ -414,7 +416,7 @@ export default function Home() {
       </section>
 
       {/* ── TOURS LIST ── */}
-      <section className="px-3 pt-5 pb-24 w-full max-w-lg mx-auto">
+      <section className="pt-4 pb-24 w-full max-w-lg mx-auto">
         {loading ? (
           <div className="flex justify-center py-20">
             <div className="w-8 h-8 rounded-full border-2 animate-spin"
@@ -428,7 +430,7 @@ export default function Home() {
             </p>
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col">
             {filteredTours.map((tour, i) => (
               <div key={tour.id} style={{ animationDelay:`${i * 60}ms` }}>
                 <TourCard tour={tour} lang={lang} t={t[lang]} />
