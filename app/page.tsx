@@ -61,8 +61,9 @@ function TourCard({ tour, lang, t }: { tour: any; lang: 'ru' | 'en'; t: any }) {
       style={{
         background: 'rgba(255,255,255,0.08)',
         border: '1px solid rgba(255,255,255,0.14)',
-        borderRadius: 24,
-        boxShadow: '0 8px 32px -12px rgba(0,0,0,0.6)',
+        borderRadius: 12,
+        boxShadow: '0 4px 24px rgba(0,0,0,0.35)',
+        borderLeft: '3px solid rgba(245,158,11,0.5)',
       }}
     >
       <Link href={`/tour/${tour.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
@@ -115,19 +116,19 @@ function TourCard({ tour, lang, t }: { tour: any; lang: 'ru' | 'en'; t: any }) {
           )}
 
           {tour.hot && (
-            <div className="absolute top-3 left-3 z-20">
-              <span className="px-2.5 py-1 rounded-full text-[8px] font-black uppercase tracking-tight"
-                style={{ background: 'linear-gradient(135deg,#92400e,#b91c1c)', color: '#fff', boxShadow: '0 0 14px rgba(185,28,28,0.5)', border: '1px solid rgba(255,255,255,0.15)' }}>
-                🔥 {t.hot}
+            <div className="absolute top-0 left-0 z-20">
+              <span style={{ display:'block', padding:'5px 12px', background:'linear-gradient(90deg,#b91c1c,#92400e)', color:'#fff', fontSize:8, fontWeight:900, letterSpacing:'0.25em', textTransform:'uppercase', borderBottomRightRadius:10 }}>
+                ХИТ СЕЗОНА
               </span>
             </div>
           )}
 
           {tour.duration_h && (
-            <span className="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg text-[9px] font-bold z-10"
-              style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.75)' }}>
-              ⏱ {tour.duration_h}ч
-            </span>
+            <div className="absolute top-3 right-3 z-20 flex items-center gap-1 px-3 py-1.5 rounded-lg"
+              style={{ background:'rgba(0,0,0,0.72)', backdropFilter:'blur(12px)', border:'1px solid rgba(255,255,255,0.18)' }}>
+              <span style={{ fontSize:11, color:'#f59e0b', fontWeight:900 }}>{tour.duration_h}</span>
+              <span style={{ fontSize:9, color:'rgba(255,255,255,0.6)', fontWeight:700 }}>ч</span>
+            </div>
           )}
 
           <div className="absolute bottom-0 inset-x-0 h-1/3 pointer-events-none"
@@ -294,7 +295,7 @@ export default function Home() {
 
         .hero-photo{
           position:absolute; inset:0; width:100%; height:100%;
-          object-fit:cover; object-position:20% 60%;
+          object-fit:cover; object-position:5% 55%;
           opacity:0; transform:scale(1.07);
           transition:opacity 1.5s ease, transform 2s ease;
         }
